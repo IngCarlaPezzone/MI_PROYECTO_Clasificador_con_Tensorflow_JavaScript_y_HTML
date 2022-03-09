@@ -1,0 +1,82 @@
+<html>
+<head>
+<!--Cargar el archivo TensorFlow.js-->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"> </script>
+<title>Clasificador de perros y gatos</title>
+</head>
+<body>
+    
+    <!-- Mensaje que da título e indica lo que tiene que hacer-->
+    <div id="titulo">CLASIFICADOR DE PERROS Y GATOS</div>
+    <p> </p>
+    <!-- Mensaje que indica hacer la predicción-->
+    <div id="inicio">Para comenzar, busque una foto de perro o gato: </div>
+    
+    <!-- Para buscar una imagen desde un directorio-->
+    <input type='file' accept='image/*' name="image" id="file"  onchange="loadFile(event)" style="display: none;">
+    <!-- Para dar un espacio-->
+    <p> </p>
+    <button><label for="file" style="cursor: pointer;">Haga click aqui para eleccionar una imagen</label></button>
+    
+    <!-- Para dar un espacio-->
+    <p> </p>
+    <!-- Mensaje que indica su imagen ingresada-->
+    <div id="suIngreso">Esta es su imagen ingresada:</div>
+    
+    <!-- Para dar un espacio-->
+    <p> </p>
+    <!-- Para mostrar la imagen seleccionada-->
+    <script>
+    var loadFile = function(event) {
+        var image = document.getElementById('output');
+        image.src = URL.createObjectURL(event.target.files[0]);
+    };
+    </script>
+    <img id="output" name= "imagen" width="150" height="150" />
+    <canvas id="canvas" width="150" height="150" style="display: none" onchange="loadImage()"></canvas>
+    
+    <!-- Para dar un espacio-->
+    <p> </p>
+    <!-- Mensaje que indica hacer la predicción-->
+    <div>Una vez seleccionada la imagen, haga la predicción:</div>
+    
+    <!-- Para dar un espacio-->
+    <p> </p>
+    <!-- Botón para ejecutar la predicción-->
+    <button><label id="prediccion" for="predecir" style="cursor: pointer;">Haga click aqui para predecir</label></button>
+    <p> </p>
+    <!-- Mensaje que indica hacer la predicción-->
+    <div id="respuesta"></id><label id="respuesta">Cargando predicción...</label></div>
+    
+    
+    <script>
+    //Comienzan los códigos en JS
+        
+    async function inicializar() {
+        //Función que prepara para el evento click sobre el botón de predecir.
+        document.getElementById('prediccion').addEventListener('click', () => predecir());
+
+    };
+
+    async function predecir() {
+        //Función que carga el modelo preentrenado, toma la imagen cargada, la redimensiona, la convierte a tensor y
+        //realiza la predicción pasandola por el modelo.
+        const modelo = await tf.loadLayersModel('trained-model/model.json');
+        const canvas = document.getElementById('output');
+        const tensorImg = tf.browser.fromPixels(canvas).resizeNearestNeighbor([150, 150]).toFloat().expandDims();
+        const prediction = modelo.predict(tensorImg);
+        var respuesta;
+        if (prediction <= .5) {
+          respuesta = "ES UN GATO!!";
+        } else {
+          respuesta = "ES UN PERRO!!";
+        }
+        document.getElementById("respuesta").innerHTML = respuesta; //Para insertar la respuesta en el elemento con ese Id
+
+    };
+    // Llama a la función de inicializar con la apertura de la página.
+    inicializar()
+    </script>
+</body>
+
+</html>
